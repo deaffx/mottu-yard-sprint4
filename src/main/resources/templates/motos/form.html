@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moto - Mottu Yard</title>
+    <th:block th:replace="fragments/assets :: tailwind"></th:block>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body class="bg-slate-200 text-slate-800 min-h-screen flex flex-col">
+    <header th:replace="~{fragments/app-header :: header('motos')}"></header>
+
+    <main class="flex-1">
+        <div class="max-w-5xl mx-auto px-6 py-10 space-y-8">
+            <th:block th:replace="~{fragments/page-components :: form-header(${moto.id != null}, 'Moto', 'Preencha os dados obrigatórios da motocicleta cadastrada no pátio.', @{/motos})}"></th:block>
+
+            <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <div class="border-b border-slate-200 px-8 py-6">
+                    <h2 class="text-lg font-semibold text-slate-700">Dados da moto</h2>
+                </div>
+
+                <div class="px-8 py-8">
+                    <form th:action="${moto.id != null} ? @{/motos/edit/{id}(id=${moto.id})} : @{/motos/create}" th:object="${moto}" method="post" class="space-y-8">
+                        <div class="grid gap-6 md:grid-cols-2">
+                            <div>
+                                <label for="modelo" class="mb-2 block text-sm font-semibold text-slate-600">Modelo <span class="text-rose-500">*</span></label>
+                                <input id="modelo" type="text" th:field="*{modelo}" placeholder="Ex: CG 160 Start"
+                                       class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm shadow-sm focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy/40" required>
+                                <p th:if="${#fields.hasErrors('modelo')}" th:errors="*{modelo}" class="mt-1 text-xs text-rose-600"></p>
+                            </div>
+                            <div>
+                                <label for="marca" class="mb-2 block text-sm font-semibold text-slate-600">Marca <span class="text-rose-500">*</span></label>
+                                <input id="marca" type="text" th:field="*{marca}" placeholder="Ex: Honda"
+                                       class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm shadow-sm focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy/40" required>
+                                <p th:if="${#fields.hasErrors('marca')}" th:errors="*{marca}" class="mt-1 text-xs text-rose-600"></p>
+                            </div>
+                            <div>
+                                <label for="placa" class="mb-2 block text-sm font-semibold text-slate-600">Placa <span class="text-rose-500">*</span></label>
+                                <input id="placa" type="text" th:field="*{placa}" placeholder="ABC1D23" maxlength="7"
+                                       class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm font-mono uppercase shadow-sm focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy/40" required>
+                                <p class="mt-1 text-xs text-slate-400">Formato Mercosul (ABC1D23) ou antigo (ABC1234).</p>
+                                <p th:if="${#fields.hasErrors('placa')}" th:errors="*{placa}" class="mt-1 text-xs text-rose-600"></p>
+                            </div>
+                            <div>
+                                <label for="anoFabricacao" class="mb-2 block text-sm font-semibold text-slate-600">Ano de fabricação <span class="text-rose-500">*</span></label>
+                                <input id="anoFabricacao" type="number" th:field="*{anoFabricacao}" min="1990"
+                                       class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm shadow-sm focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy/40" required>
+                                <p th:if="${#fields.hasErrors('anoFabricacao')}" th:errors="*{anoFabricacao}" class="mt-1 text-xs text-rose-600"></p>
+                            </div>
+                            <div>
+                                <label for="cor" class="mb-2 block text-sm font-semibold text-slate-600">Cor</label>
+                                <input id="cor" type="text" th:field="*{cor}" placeholder="Vermelho"
+                                       class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm shadow-sm focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy/40">
+                                <p th:if="${#fields.hasErrors('cor')}" th:errors="*{cor}" class="mt-1 text-xs text-rose-600"></p>
+                            </div>
+                            <div>
+                                <label for="quilometragem" class="mb-2 block text-sm font-semibold text-slate-600">Quilometragem (km)</label>
+                                <input id="quilometragem" type="number" th:field="*{quilometragem}" min="0"
+                                       class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm shadow-sm focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy/40">
+                                <p th:if="${#fields.hasErrors('quilometragem')}" th:errors="*{quilometragem}" class="mt-1 text-xs text-rose-600"></p>
+                            </div>
+                            <div>
+                                <label for="statusMoto" class="mb-2 block text-sm font-semibold text-slate-600">Status <span class="text-rose-500">*</span></label>
+                                <select id="statusMoto" th:field="*{statusMoto}" class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm shadow-sm focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy/40" required>
+                                    <option value="">Selecione o status</option>
+                    <option th:each="status : ${T(br.com.fiap.mottu.yard.model.Moto.StatusMoto).values()}"
+                        th:value="${status}" th:text="${status.label}"></option>
+                                </select>
+                                <p th:if="${#fields.hasErrors('statusMoto')}" th:errors="*{statusMoto}" class="mt-1 text-xs text-rose-600"></p>
+                            </div>
+                            <div>
+                                <label for="patioAtual" class="mb-2 block text-sm font-semibold text-slate-600">Pátio atual <span class="text-rose-500">*</span></label>
+                                <select id="patioAtual" th:field="*{patioAtual.id}" class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm shadow-sm focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy/40" required>
+                                    <option value="">Selecione o pátio</option>
+                                    <option th:each="patio : ${patios}" 
+                                            th:value="${patio.id}" 
+                                            th:text="${patio.nome + ' (' + @patioService.getOcupacaoAtual(patio) + '/' + patio.capacidadeMaxima + ')'}">
+                                    </option>
+                                </select>
+                                <p th:if="${#fields.hasErrors('patioAtual')}" th:errors="*{patioAtual}" class="mt-1 text-xs text-rose-600"></p>
+                            </div>
+                        </div>
+
+                        <!-- Seção de Localização Inteligente -->
+                        <div class="rounded-lg border border-slate-200 bg-slate-50 p-6 space-y-4">
+                            <div class="flex items-center gap-2">
+                                <i class="bi bi-pin-map-fill text-lg text-navy"></i>
+                                <h3 class="text-base font-semibold text-slate-700">Localização no Pátio</h3>
+                            </div>
+
+                            <!-- Sugestão Inteligente -->
+                            <div th:if="${vagaSugerida != null}" class="rounded-md bg-blue-50 border border-blue-200 p-4">
+                                <div class="flex items-start gap-3">
+                                    <i class="bi bi-lightbulb-fill text-xl text-blue-600"></i>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-semibold text-blue-900">Sugestão Inteligente</p>
+                                        <p class="mt-1 text-xs text-blue-700">
+                                            Localização recomendada: <strong th:text="${vagaSugerida.localizacaoCompleta}">A-15</strong>
+                                        </p>
+                                        <p class="mt-1 text-xs text-blue-600" th:text="${vagaSugerida.motivo}">Setor com menor ocupação</p>
+                                        <p class="mt-1 text-xs text-blue-500">
+                                            Ocupação do setor: <span th:text="${#numbers.formatDecimal(vagaSugerida.percentualOcupacaoSetor, 1, 1)}">45.0</span>%
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid gap-4 md:grid-cols-3">
+                                <div>
+                                    <label for="setor" class="mb-2 block text-sm font-semibold text-slate-600">Setor</label>
+                                    <input id="setor" type="text" th:field="*{setor}" maxlength="5" placeholder="Ex: A"
+                                           class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm uppercase shadow-sm focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy/40">
+                                    <p class="mt-1 text-xs text-slate-400">Opcional - deixe vazio para sugestão automática</p>
+                                </div>
+                                <div>
+                                    <label for="vaga" class="mb-2 block text-sm font-semibold text-slate-600">Vaga</label>
+                                    <input id="vaga" type="number" th:field="*{vaga}" min="1" placeholder="Ex: 15"
+                                           class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm shadow-sm focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy/40">
+                                    <p class="mt-1 text-xs text-slate-400">Número da vaga no setor</p>
+                                </div>
+                                <div class="md:col-span-1">
+                                    <label for="localizacaoObservacao" class="mb-2 block text-sm font-semibold text-slate-600">Observação</label>
+                                    <input id="localizacaoObservacao" type="text" th:field="*{localizacaoObservacao}" maxlength="200" placeholder="Ex: Próximo ao portão"
+                                           class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm shadow-sm focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy/40">
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-2 text-xs text-slate-500">
+                                <i class="bi bi-info-circle mt-0.5"></i>
+                                <p>Se não especificar setor e vaga, o sistema alocará automaticamente na melhor posição disponível baseado no status da moto.</p>
+                            </div>
+                        </div>
+
+                        <th:block th:replace="~{fragments/page-components :: form-buttons(${moto.id != null}, 'Moto', @{/motos})}"></th:block>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </main>
+    <footer th:replace="~{fragments/app-footer :: footer}"></footer>
+    </footer>
+
+    <script>
+        const placaInput = document.getElementById('placa');
+        if (placaInput) {
+            placaInput.addEventListener('input', (event) => {
+                event.target.value = event.target.value.toUpperCase();
+            });
+        }
+
+        const setorInput = document.getElementById('setor');
+        if (setorInput) {
+            setorInput.addEventListener('input', (event) => {
+                event.target.value = event.target.value.toUpperCase();
+            });
+        }
+
+        // Auto-preencher com sugestão ao clicar
+        const usarSugestaoBtn = document.querySelector('[data-usar-sugestao]');
+        if (usarSugestaoBtn) {
+            usarSugestaoBtn.addEventListener('click', () => {
+                const sugestao = usarSugestaoBtn.dataset;
+                if (sugestao.setor) document.getElementById('setor').value = sugestao.setor;
+                if (sugestao.vaga) document.getElementById('vaga').value = sugestao.vaga;
+            });
+        }
+    </script>
+</body>
+</html>

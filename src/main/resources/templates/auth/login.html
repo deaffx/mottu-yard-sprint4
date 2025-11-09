@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Mottu Yard</title>
+    <th:block th:replace="fragments/assets :: tailwind"></th:block>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-slate-100 via-slate-200 to-slate-100">
+    <div class="flex min-h-screen items-center justify-center px-4">
+        <div class="w-full max-w-md">
+            <div class="rounded-3xl border border-white/60 bg-white/90 p-8 shadow-xl backdrop-blur space-y-6">
+                <div th:if="${param.error}"
+                     class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                    <span th:text="${error ?: 'Credenciais inválidas ou falha na autenticação.'}">Falha na autenticação</span>
+                </div>
+
+                <div th:if="${param.logout}"
+                     class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                    <span th:text="${message ?: 'Sessão encerrada com sucesso.'}">Logout realizado</span>
+                </div>
+
+                <div class="flex flex-col items-center text-center space-y-3">
+                    <h1 class="mt-2 text-3xl font-bold text-slate-800">Bem-vindo ao Mottu Yard</h1>
+                    <p class="text-sm text-slate-500">Acesso exclusivo via GitHub.</p>
+                </div>
+
+                <div class="space-y-4">
+                    <a th:if="${githubConfigured}"
+                       th:href="${githubAuthUrl}"
+                       class="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow hover:border-navy hover:text-navy transition">
+                        <i class="bi bi-github text-xl"></i>
+                        Entrar com GitHub
+                    </a>
+                    <div th:unless="${githubConfigured}" class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-700">
+                        Configure o client-id e o client-secret do GitHub no arquivo <code>application.properties</code> ou no <code>.env</code> para habilitar esta opção.
+                    </div>
+                </div>
+            </div>
+
+            <p class="mt-6 text-center text-xs text-slate-500">
+                Challenge - FIAP Java Advanced<br>
+                Thiago Moreno Matheus (RM554507) - Celso Canaveze (RM556118)
+            </p>
+        </div>
+    </div>
+</body>
+</html>

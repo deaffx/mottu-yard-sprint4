@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<footer th:fragment="footer" class="bg-white/80 border-t border-slate-200">
+    <div class="max-w-7xl mx-auto flex flex-col gap-2 px-6 py-4 text-center text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+        <span>© <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy')}">2024</span> Mottu Yard. Todos os direitos reservados.</span>
+        <span>Challenge FIAP - Java Advanced</span>
+    </div>
+</footer>
+</html>

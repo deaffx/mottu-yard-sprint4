@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Pátio</title>
+    <th:block th:replace="fragments/assets :: tailwind"></th:block>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body class="bg-slate-200 text-slate-800 min-h-screen flex flex-col">
+    <header th:replace="~{fragments/app-header :: header('patios')}"></header>
+
+    <main class="flex-1">
+        <div class="max-w-5xl mx-auto px-6 py-10 space-y-8">
+            <!-- Cabeçalho personalizado com botão de mapa -->
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-slate-800" th:text="${patio.nome}">Nome do Pátio</h1>
+                    <p class="mt-2 text-sm text-slate-600">Visão detalhada das informações e ocupação do pátio.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a th:href="@{/patios/{id}/mapa(id=${patio.id})}" 
+                       class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 shadow-md transition-colors">
+                        <i class="bi bi-diagram-3-fill"></i>
+                        Ver Mapa de Calor
+                    </a>
+                    <a th:href="@{/patios}" 
+                       class="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 border border-slate-300 transition-colors">
+                        <i class="bi bi-arrow-left"></i>
+                        Voltar
+                    </a>
+                </div>
+            </div>
+
+            <section class="grid gap-6 md:grid-cols-3">
+                <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Capacidade</h2>
+                    <p class="mt-4 text-3xl font-bold text-navy" th:text="${patio.capacidadeMaxima}">0</p>
+                    <p class="text-xs text-slate-500 mt-2">Número máximo de motos permitidas no pátio.</p>
+                </article>
+                <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Ocupação atual</h2>
+                    <p class="mt-4 text-3xl font-bold text-navy" th:text="${ocupacaoAtual}">0</p>
+                    <p class="text-xs text-slate-500 mt-2">Motos atualmente estacionadas neste pátio.</p>
+                </article>
+                <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Taxa de ocupação</h2>
+                    <p class="mt-4 text-3xl font-bold" th:text="${#numbers.formatDecimal(taxaOcupacao,1,1)} + '%'">0%</p>
+                    <div class="mt-3 h-2 w-full rounded-full bg-slate-300">
+                        <div class="h-2 rounded-full bg-blue-600" th:style="${taxaOcupacaoBarra}">
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 class="text-lg font-semibold text-slate-700">Informações cadastrais</h2>
+                <div class="mt-6 grid gap-4 md:grid-cols-2">
+                    <th:block th:replace="~{fragments/page-components :: field('Nome', ${patio.nome}, null)}"></th:block>
+                    <th:block th:replace="~{fragments/page-components :: field('Capacidade máxima', ${patio.capacidadeMaxima}, null)}"></th:block>
+                    <div class="md:col-span-2">
+                        <th:block th:replace="~{fragments/page-components :: field('Endereço', ${patio.endereco}, null)}"></th:block>
+                    </div>
+                    <th:block th:replace="~{fragments/page-components :: field('Latitude', ${patio.latitude}, 'Não informada')}"></th:block>
+                    <th:block th:replace="~{fragments/page-components :: field('Longitude', ${patio.longitude}, 'Não informada')}"></th:block>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/app-footer :: footer}"></footer>
+</body>
+</html>

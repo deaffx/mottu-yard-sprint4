@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manutenção - Mottu Yard</title>
+    <th:block th:replace="fragments/assets :: tailwind"></th:block>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-slate-200 text-slate-800 min-h-screen flex flex-col">
+<header th:replace="~{fragments/app-header :: header('manutencao')}"></header>
+
+<main class="flex-1">
+    <div class="max-w-5xl mx-auto px-6 py-10 space-y-8">
+        <th:block th:replace="~{fragments/page-components :: form-header(${isEdit}, 'Manutenção', 'Informe os detalhes da intervenção programada na moto selecionada.', @{/manutencao})}"></th:block>
+
+        <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="border-b border-slate-200 px-8 py-6">
+                <h2 class="text-lg font-semibold text-slate-700">Dados da manutenção</h2>
+            </div>
+
+            <div th:if="${error != null}" class="mx-8 mt-6 rounded-xl border border-rose-200 bg-rose-50 px-6 py-4 text-sm text-rose-700">
+                <i class="bi bi-exclamation-triangle-fill mr-2"></i>
+                <span th:text="${error}">Erro</span>
+            </div>
+
+            <div th:unless="${isEdit}" th:if="${motos == null or #lists.isEmpty(motos)}" class="mx-8 mt-6 rounded-xl border border-amber-200 bg-amber-50 px-6 py-4 text-sm text-amber-700">
+                <span>Não há motos com status "Para Manutenção" disponíveis.</span>
+            </div>
+
+            <div class="px-8 py-8">
+                <form th:object="${manutencao}" th:action="${isEdit} ? @{/manutencao/edit/{id}(id=${manutencao.id})} : @{/manutencao/create}" method="post" class="space-y-8"
+                      x-data="{ statusManutencao: $el.querySelector('#statusManutencao')?.value || '' }">
+                    <div class="grid gap-6 md:grid-cols-2">
+                        <div>
+                            <label for="moto" class="mb-2 block text-sm font-semibold text-slate-600">Moto <span class="text-rose-500">*</span></label>
+                            <div th:if="${isEdit}">
+                                <input type="text" 
+                                       th:value="${manutencao.moto.modelo + ' - ' + manutencao.moto.placa}"
+                                       readonly
+                                       class="w-full rounded-lg border border-slate-300 bg-slate-100 px-4 py-2 text-sm shadow-sm cursor-not-allowed text-slate-600">
+                                <input type="hidden" th:field="*{moto.id}">
+                                <p class="mt-1 text-xs text-slate-500 italic">
+                                    <i class="bi bi-info-circle"></i> A moto não pode ser alterada
+                                </p>
+                            </div>
+                            <div th:unless="${isEdit}">
+                                <select id="moto" th:field="*{moto.id}" required 
+                                        class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm shadow-sm focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                                    <option value="" disabled selected>Selecione a moto</option>
+                                    <option th:each="moto : ${motos}" th:value="${moto.id}" th:text="${moto.modelo + ' - ' + moto.placa}">Moto</option>
+                                </select>
+                            </div>
+                            
+                            <p th:if="${#fields.hasErrors('moto')}" th:errors="*{moto}" class="mt-1 text-xs text-rose-600"></p>
+                        </div>
+                        <div>
+                            <label for="tipoManutencao" class="mb-2 block text-sm font-semibold text-slate-600">Tipo da manutenção <span class="text-rose-500">*</span></label>
+                            <select id="tipoManutencao" th:field="*{tipoManutencao}" required class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm shadow-sm focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                                <option value="" disabled selected>Selecione o tipo</option>
+                                <option th:each="tipo : ${tipos}" th:value="${tipo.name()}" th:text="${tipo.label}">Tipo</option>
+                            </select>
+                            <p th:if="${#fields.hasErrors('tipoManutencao')}" th:errors="*{tipoManutencao}" class="mt-1 text-xs text-rose-600"></p>
+                        </div>
+                        <div>
+                            <label for="statusManutencao" class="mb-2 block text-sm font-semibold text-slate-600">Status <span class="text-rose-500">*</span></label>
+                            <select id="statusManutencao" th:field="*{statusManutencao}" required 
+                                    class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm shadow-sm focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                                    x-model="statusManutencao">
+                                <option value="" disabled selected>Selecione o status</option>
+                                <option th:each="status : ${statusOptions}" th:value="${status.name()}" th:text="${status.label}">Status</option>
+                            </select>
+                            <p th:if="${#fields.hasErrors('statusManutencao')}" th:errors="*{statusManutencao}" class="mt-1 text-xs text-rose-600"></p>
+                        </div>
+                        <div>
+                            <label for="dataAgendada" class="mb-2 block text-sm font-semibold text-slate-600">
+                                Data para agendamento 
+                                <span x-show="statusManutencao === 'AGENDADA'" class="text-rose-500">*</span>
+                            </label>
+                            <input id="dataAgendada" type="datetime-local" th:field="*{dataAgendada}" 
+                                   x-bind:required="statusManutencao === 'AGENDADA'"
+                                   class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm shadow-sm focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                            <p class="mt-1 text-xs" 
+                               x-show="statusManutencao === 'AGENDADA'"
+                               x-bind:class="statusManutencao === 'AGENDADA' ? 'text-slate-600' : 'text-slate-500'"
+                               x-text="statusManutencao === 'AGENDADA' ? 'Obrigatória para status \'Agendada\'.' : (statusManutencao === 'EM_ANDAMENTO' ? 'Opcional. A data de início será definida automaticamente como agora.' : 'Opcional.')">
+                            </p>
+                            <p class="mt-1 text-xs text-slate-500" 
+                               x-show="statusManutencao === 'EM_ANDAMENTO'"
+                               x-text="'Opcional. A data de início será definida automaticamente como agora.'">
+                            </p>
+                            <p class="mt-1 text-xs text-slate-500" 
+                               x-show="statusManutencao === 'CONCLUIDA'"
+                               x-text="'Opcional.'">
+                            </p>
+                            <p th:if="${#fields.hasErrors('dataAgendada')}" th:errors="*{dataAgendada}" class="mt-1 text-xs text-rose-600"></p>
+                        </div>
+                        <div>
+                            <label for="valorTotal" class="mb-2 block text-sm font-semibold text-slate-600">Valor estimado (opcional)</label>
+                            <input id="valorTotal" type="number" step="0.01" min="0" th:field="*{valorTotal}" class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm shadow-sm focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                            <p th:if="${#fields.hasErrors('valorTotal')}" th:errors="*{valorTotal}" class="mt-1 text-xs text-rose-600"></p>
+                        </div>
+                        <div>
+                            <label for="pecasUtilizadas" class="mb-2 block text-sm font-semibold text-slate-600">Peças previstas (opcional)</label>
+                            <input id="pecasUtilizadas" type="text" th:field="*{pecasUtilizadas}" placeholder="Correia dentada, pastilha de freio..." class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm shadow-sm focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                            <p th:if="${#fields.hasErrors('pecasUtilizadas')}" th:errors="*{pecasUtilizadas}" class="mt-1 text-xs text-rose-600"></p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="descricao" class="mb-2 block text-sm font-semibold text-slate-600">Descrição</label>
+                        <textarea id="descricao" th:field="*{descricao}" rows="4" placeholder="Explique o motivo da manutenção, sintomas e instruções." class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm shadow-sm focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40"></textarea>
+                        <p th:if="${#fields.hasErrors('descricao')}" th:errors="*{descricao}" class="mt-1 text-xs text-rose-600"></p>
+                    </div>
+                    
+                    <!-- Informações somente leitura quando estiver editando -->
+                    <div th:if="${isEdit}" class="rounded-lg border border-slate-200 bg-slate-50 p-6">
+                        <h3 class="text-sm font-semibold text-slate-700 mb-4">Informações do andamento</h3>
+                        <div class="grid gap-4 md:grid-cols-3">
+                            <div>
+                                <p class="text-xs font-medium text-slate-500 mb-1">Status</p>
+                                <p class="text-sm font-semibold text-slate-800" th:text="${manutencao.statusManutencao.label}">Status</p>
+                            </div>
+                            <div th:if="${manutencao.dataIniciada != null}">
+                                <p class="text-xs font-medium text-slate-500 mb-1">Data de início</p>
+                                <p class="text-sm font-semibold text-slate-800" th:text="${#temporals.format(manutencao.dataIniciada, 'dd/MM/yyyy HH:mm')}">--</p>
+                            </div>
+                            <div th:if="${manutencao.dataConcluida != null}">
+                                <p class="text-xs font-medium text-slate-500 mb-1">Data de conclusão</p>
+                                <p class="text-sm font-semibold text-slate-800" th:text="${#temporals.format(manutencao.dataConcluida, 'dd/MM/yyyy HH:mm')}">--</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <th:block th:replace="~{fragments/page-components :: form-buttons(${isEdit}, 'Manutenção', @{/manutencao})}"></th:block>
+                </form>
+            </div>
+        </section>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/app-footer :: footer}"></footer>
+</body>
+</html>

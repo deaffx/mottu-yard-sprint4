@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes da manutenção</title>
+    <th:block th:replace="fragments/assets :: tailwind"></th:block>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body class="bg-slate-200 text-slate-800 min-h-screen flex flex-col">
+<header th:replace="~{fragments/app-header :: header('manutencao')}"></header>
+
+<main class="flex-1">
+    <div class="max-w-4xl mx-auto px-6 py-10 space-y-8">
+        <th:block th:replace="~{fragments/page-components :: details-header('Manutenção #' + ${manutencao.id}, 'Visão detalhada da manutenção registrada para a moto selecionada.', @{/manutencao})}"></th:block>
+
+        <section class="grid gap-6 md:grid-cols-3">
+            <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Status</h2>
+                <div class="mt-4">
+                    <span th:replace="~{fragments/assets :: manutencao-status-tag(${manutencao})}"></span>
+                </div>
+            </article>
+            <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Tipo de Manutenção</h2>
+                <p class="mt-4 text-2xl font-bold text-navy" th:text="${manutencao.tipoManutencao.label}">Tipo</p>
+            </article>
+            <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Valor Total</h2>
+                <p class="mt-4 text-2xl font-bold text-navy">
+                    <span th:if="${manutencao.valorTotal != null}" th:text="${'R$ ' + #numbers.formatDecimal(manutencao.valorTotal, 2, 2)}">R$ 0,00</span>
+                    <span th:unless="${manutencao.valorTotal != null}" class="text-slate-400 text-base font-medium">Não informado</span>
+                </p>
+            </article>
+        </section>
+
+        <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 class="text-lg font-semibold text-slate-700">Informações da moto</h2>
+            <div class="mt-6 grid gap-4 md:grid-cols-2">
+                <th:block th:replace="~{fragments/page-components :: field('Modelo', ${manutencao.moto.modelo}, null)}"></th:block>
+                <th:block th:replace="~{fragments/page-components :: field('Marca', ${manutencao.moto.marca}, null)}"></th:block>
+                <th:block th:replace="~{fragments/page-components :: field('Placa', ${manutencao.moto.placa}, null)}"></th:block>
+                <th:block th:replace="~{fragments/page-components :: field('Status da moto', ${manutencao.moto.statusMoto.label}, null)}"></th:block>
+            </div>
+        </section>
+
+        <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 class="text-lg font-semibold text-slate-700">Datas e prazos</h2>
+            <div class="mt-6 grid gap-4 md:grid-cols-2">
+                <th:block th:replace="~{fragments/page-components :: field('Data agendada', ${#temporals.format(manutencao.dataAgendada, 'dd/MM/yyyy HH:mm')}, null)}"></th:block>
+                <th:block th:replace="~{fragments/page-components :: field('Data iniciada', ${manutencao.dataIniciada != null ? #temporals.format(manutencao.dataIniciada, 'dd/MM/yyyy HH:mm') : null}, 'Ainda não iniciada')}"></th:block>
+                <th:block th:replace="~{fragments/page-components :: field('Data concluída', ${manutencao.dataConcluida != null ? #temporals.format(manutencao.dataConcluida, 'dd/MM/yyyy HH:mm') : null}, 'Aguardando conclusão')}"></th:block>
+            </div>
+        </section>
+
+        <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 class="text-lg font-semibold text-slate-700">Detalhes técnicos</h2>
+            <div class="mt-6 grid gap-4 md:grid-cols-2">
+                <th:block th:replace="~{fragments/page-components :: field('Peças utilizadas', ${manutencao.pecasUtilizadas}, 'Sem peças registradas')}"></th:block>
+                <th:block th:replace="~{fragments/page-components :: field('Código interno', ${manutencao.id}, null)}"></th:block>
+                <div class="md:col-span-2">
+                    <p class="text-xs uppercase tracking-wide text-slate-500">Descrição</p>
+                    <p class="mt-1 text-sm font-medium text-slate-800">
+                        <span th:if="${manutencao.descricao != null}" th:text="${manutencao.descricao}">Descrição da manutenção.</span>
+                        <span th:unless="${manutencao.descricao != null}" class="text-slate-400">Nenhum detalhamento adicional informado.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/app-footer :: footer}"></footer>
+</body>
+</html>

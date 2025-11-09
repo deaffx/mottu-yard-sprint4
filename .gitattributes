@@ -1,0 +1,28 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Scripts executáveis (Gradle Wrapper) devem usar LF em Unix
+gradlew text eol=lf
+*.sh text eol=lf
+
+# Windows scripts
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Java sources
+*.java text diff=java
+*.gradle text diff=java
+*.properties text
+
+# Documentation
+*.md text
+*.txt text
+
+# Binary files
+*.jar binary
+*.war binary
+*.class binary
+*.dll binary
+*.exe binary
+*.so binary
+*.dylib binary

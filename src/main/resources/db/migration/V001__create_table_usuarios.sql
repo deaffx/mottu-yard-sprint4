@@ -1,0 +1,13 @@
+CREATE TABLE usuarios (
+    id BIGSERIAL PRIMARY KEY,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    email VARCHAR(255),
+    name VARCHAR(255),
+    avatar_url VARCHAR(500),
+    role VARCHAR(20) NOT NULL DEFAULT 'OPERADOR',
+    perfil_confirmado BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT chk_role CHECK (role IN ('OPERADOR', 'MECANICO'))
+);

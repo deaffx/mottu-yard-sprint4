@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<header th:fragment="header(activePage)" class="bg-blue-800 text-white shadow">
+    <div class="max-w-7xl mx-auto flex flex-wrap gap-4 items-center justify-between px-6 py-5">
+        <a th:href="@{/dashboard}" class="flex items-center text-2xl font-semibold">
+            Mottu Yard
+        </a>
+        <nav class="flex flex-wrap items-center gap-3 text-sm font-medium">
+            <a th:href="@{/dashboard}"
+               class="rounded-full px-4 py-2 transition-colors duration-150"
+               th:classappend="${activePage == 'dashboard'} ? ' bg-blue-600/70 text-white' : ' hover:bg-blue-700/40 text-white/80'">
+                Dashboard
+            </a>
+            <a th:href="@{/motos}" sec:authorize="hasRole('OPERADOR')"
+               class="rounded-full px-4 py-2 transition-colors duration-150"
+               th:classappend="${activePage == 'motos'} ? ' bg-blue-600/70 text-white' : ' hover:bg-blue-700/40 text-white/80'">
+                Motos
+            </a>
+            <a th:href="@{/patios}" sec:authorize="hasRole('OPERADOR')"
+               class="rounded-full px-4 py-2 transition-colors duration-150"
+               th:classappend="${activePage == 'patios'} ? ' bg-blue-600/70 text-white' : ' hover:bg-blue-700/40 text-white/80'">
+                Pátios
+            </a>
+            <a th:href="@{/manutencao}"
+               class="rounded-full px-4 py-2 transition-colors duration-150"
+               th:classappend="${activePage == 'manutencao'} ? ' bg-blue-600/70 text-white' : ' hover:bg-blue-700/40 text-white/80'">
+                Manutenções
+            </a>
+
+            <div class="hidden h-6 w-px bg-white/40 md:block"></div>
+
+            <div class="flex items-center gap-3 rounded-full bg-white/10 px-4 py-2 text-xs uppercase tracking-wide">
+                <div class="flex items-center gap-2 text-white/80 normal-case">
+                    <span class="font-semibold" sec:authentication="name">usuário</span>
+                </div>
+                <span class="hidden h-4 w-px bg-white/30 md:block"></span>
+                <div class="flex items-center gap-2">
+                    <span sec:authorize="hasRole('OPERADOR')">Operador</span>
+                    <span sec:authorize="hasRole('MECANICO')">Mecânico</span>
+                </div>
+            </div>
+
+            <form th:action="@{/logout}" method="post" class="inline">
+                <button type="submit"
+                        class="inline-flex items-center gap-2 rounded-full border border-white/40 px-4 py-2 text-white/90 transition-colors duration-150 hover:bg-white/10">
+                    Sair
+                </button>
+            </form>
+        </nav>
+    </div>
+</header>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Recomendações - ' + ${patio.nome} + ' - Mottu Yard'">Recomendações - Mottu Yard</title>
+    <th:block th:replace="fragments/assets :: tailwind"></th:block>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body class="bg-slate-200 text-slate-800 min-h-screen flex flex-col">
+    <header th:replace="~{fragments/app-header :: header('patios')}"></header>
+
+    <main class="flex-1">
+        <div class="max-w-5xl mx-auto px-6 py-10 space-y-8">
+            <!-- Cabeçalho -->
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-slate-800 flex items-center gap-3">
+                        <i class="bi bi-lightbulb-fill text-navy"></i>
+                        Recomendações de Reorganização
+                    </h1>
+                    <p class="mt-2 text-sm text-slate-600" th:text="${patio.nome}">Pátio Central</p>
+                </div>
+                <a th:href="@{/patios/{id}/mapa(id=${patio.id})}" 
+                   class="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 border border-slate-200">
+                    <i class="bi bi-arrow-left"></i>
+                    Voltar ao Mapa
+                </a>
+            </div>
+
+            <!-- Introdução -->
+            <div class="rounded-2xl border border-blue-200 bg-blue-50 p-6">
+                <div class="flex gap-4">
+                    <div class="flex-shrink-0">
+                        <i class="bi bi-info-circle-fill text-3xl text-blue-600"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-semibold text-blue-900">Sistema Inteligente de Alocação</h2>
+                        <p class="mt-2 text-sm text-blue-800">
+                            Nosso sistema analisa continuamente a distribuição de motos no pátio e gera recomendações 
+                            para otimizar a organização, melhorar a eficiência operacional e evitar gargalos.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recomendações -->
+            <section class="space-y-4">
+                <div th:each="rec, iterStat : ${recomendacoes}" 
+                     class="rounded-xl border-2 bg-white p-6 shadow-sm transition-all hover:shadow-md"
+                     th:classappend="${#strings.contains(rec, '🚨')} ? 'border-red-300' : 
+                                   (${#strings.contains(rec, '⚠️')} ? 'border-orange-300' : 
+                                   (${#strings.contains(rec, '📊')} ? 'border-blue-300' : 
+                                   'border-green-300'))">
+                    
+                    <div class="flex items-start gap-4">
+                        <!-- Ícone -->
+                        <div class="flex-shrink-0 rounded-full p-3"
+                             th:classappend="${#strings.contains(rec, '🚨')} ? 'bg-red-100' : 
+                                           (${#strings.contains(rec, '⚠️')} ? 'bg-orange-100' : 
+                                           (${#strings.contains(rec, '📊')} ? 'bg-blue-100' : 
+                                           'bg-green-100'))">
+                            <i th:classappend="${#strings.contains(rec, '🚨')} ? 'bi bi-exclamation-triangle-fill text-2xl text-red-600' : 
+                                             (${#strings.contains(rec, '⚠️')} ? 'bi bi-exclamation-circle-fill text-2xl text-orange-600' : 
+                                             (${#strings.contains(rec, '📊')} ? 'bi bi-bar-chart-fill text-2xl text-blue-600' : 
+                                             'bi bi-check-circle-fill text-2xl text-green-600'))"></i>
+                        </div>
+
+                        <!-- Conteúdo -->
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between gap-4">
+                                <div>
+                                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                                          th:classappend="${#strings.contains(rec, '🚨')} ? 'bg-red-600 text-white' : 
+                                                        (${#strings.contains(rec, '⚠️')} ? 'bg-orange-600 text-white' : 
+                                                        (${#strings.contains(rec, '📊')} ? 'bg-blue-600 text-white' : 
+                                                        'bg-green-600 text-white'))">
+                                        <span th:text="${#strings.contains(rec, '🚨')} ? 'CRÍTICO' : 
+                                                      (${#strings.contains(rec, '⚠️')} ? 'ATENÇÃO' : 
+                                                      (${#strings.contains(rec, '📊')} ? 'INFORMATIVO' : 
+                                                      'OK')">CRÍTICO</span>
+                                    </span>
+                                    <h3 class="mt-2 text-lg font-semibold text-slate-800" 
+                                        th:text="'Recomendação #' + ${iterStat.count}">Recomendação #1</h3>
+                                </div>
+                                <span class="text-xs text-slate-500" th:text="${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy HH:mm')}">12/01/2025 14:30</span>
+                            </div>
+                            
+                            <p class="mt-3 text-sm text-slate-700 leading-relaxed" th:text="${rec}">
+                                Descrição da recomendação aqui
+                            </p>
+
+                            <!-- Ações sugeridas (se crítico ou atenção) -->
+                            <div th:if="${#strings.contains(rec, '🚨') or #strings.contains(rec, '⚠️')}" 
+                                 class="mt-4 rounded-lg bg-slate-50 p-4 border border-slate-200">
+                                <p class="text-xs font-semibold text-slate-600 uppercase mb-2">
+                                    <i class="bi bi-tools"></i> Ações Sugeridas
+                                </p>
+                                <ul class="space-y-1 text-sm text-slate-700">
+                                    <li th:if="${#strings.contains(rec, 'lotado')}" class="flex items-start gap-2">
+                                        <i class="bi bi-check2 text-green-600 mt-0.5"></i>
+                                        <span>Redistribuir motos para setores com menor ocupação</span>
+                                    </li>
+                                    <li th:if="${#strings.contains(rec, 'desequilíbrio')}" class="flex items-start gap-2">
+                                        <i class="bi bi-check2 text-green-600 mt-0.5"></i>
+                                        <span>Balancear a distribuição entre os setores</span>
+                                    </li>
+                                    <li th:if="${#strings.contains(rec, 'capacidade máxima')}" class="flex items-start gap-2">
+                                        <i class="bi bi-check2 text-green-600 mt-0.5"></i>
+                                        <span>Considerar transferir motos para outros pátios</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i class="bi bi-check2 text-green-600 mt-0.5"></i>
+                                        <span>Acessar o mapa de calor para visualizar a distribuição atual</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estado vazio -->
+                <div th:if="${#lists.isEmpty(recomendacoes)}" 
+                     class="rounded-xl border-2 border-green-300 bg-white p-12 text-center">
+                    <div class="flex flex-col items-center">
+                        <div class="rounded-full bg-green-100 p-6">
+                            <i class="bi bi-check-circle-fill text-5xl text-green-600"></i>
+                        </div>
+                        <h3 class="mt-6 text-xl font-semibold text-slate-800">Tudo Certo!</h3>
+                        <p class="mt-2 text-sm text-slate-600 max-w-md">
+                            O pátio está bem organizado e não há recomendações de reorganização no momento. 
+                            Continue monitorando o mapa de calor para manter a eficiência.
+                        </p>
+                        <a th:href="@{/patios/{id}/mapa(id=${patio.id})}" 
+                           class="mt-6 inline-flex items-center gap-2 rounded-lg bg-navy px-4 py-2 text-sm font-medium text-white hover:bg-navy/90">
+                            <i class="bi bi-diagram-3-fill"></i>
+                            Ver Mapa de Calor
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Legenda de Prioridades -->
+            <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 class="text-sm font-semibold text-slate-700 uppercase mb-4">
+                    <i class="bi bi-info-circle"></i> Legenda de Prioridades
+                </h3>
+                <div class="grid gap-4 md:grid-cols-2">
+                    <div class="flex items-center gap-3">
+                        <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-red-100">
+                            <i class="bi bi-exclamation-triangle-fill text-red-600"></i>
+                        </span>
+                        <div>
+                            <p class="text-sm font-semibold text-slate-800">Crítico 🚨</p>
+                            <p class="text-xs text-slate-600">Requer ação imediata</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-orange-100">
+                            <i class="bi bi-exclamation-circle-fill text-orange-600"></i>
+                        </span>
+                        <div>
+                            <p class="text-sm font-semibold text-slate-800">Atenção ⚠️</p>
+                            <p class="text-xs text-slate-600">Monitorar situação</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-blue-100">
+                            <i class="bi bi-bar-chart-fill text-blue-600"></i>
+                        </span>
+                        <div>
+                            <p class="text-sm font-semibold text-slate-800">Informativo 📊</p>
+                            <p class="text-xs text-slate-600">Dados para análise</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-green-100">
+                            <i class="bi bi-check-circle-fill text-green-600"></i>
+                        </span>
+                        <div>
+                            <p class="text-sm font-semibold text-slate-800">OK ✅</p>
+                            <p class="text-xs text-slate-600">Situação normal</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/app-footer :: footer}"></footer>
+</body>
+</html>

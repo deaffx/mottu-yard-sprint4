@@ -1,0 +1,66 @@
+services:
+  # Serviço web da aplicação Spring Boot
+  - type: web
+    name: mottu-yard
+    runtime: docker
+    plan: free # ou starter para produção
+    region: oregon # escolha: oregon, frankfurt, singapore, etc.
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    
+    # Variáveis de ambiente (sensíveis devem ser configuradas no dashboard)
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mottu-yard-db
+          property: connectionString
+      
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: mottu-yard-db
+          property: connectionString
+      
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: mottu-yard-db
+          property: user
+      
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: mottu-yard-db
+          property: password
+      
+      # GitHub OAuth2 - configure no dashboard do Render
+      - key: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_ID
+        sync: false # será configurado manualmente
+      
+      - key: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_SECRET
+        sync: false # será configurado manualmente
+      
+      - key: SPRING_FLYWAY_ENABLED
+        value: true
+      
+      - key: SPRING_FLYWAY_BASELINE_ON_MIGRATE
+        value: true
+      
+      - key: PORT
+        value: 8080
+    
+    # Healthcheck
+    healthCheckPath: /actuator/health
+    
+    # Auto-deploy em push para main
+    autoDeploy: true
+
+# Database PostgreSQL gerenciado
+databases:
+  - name: mottu-yard-db
+    plan: free # ou starter para produção
+    databaseName: mottuyard_db
+    user: mottuyard_user
+    region: oregon # mesma região do serviço web
+    ipAllowList: [] # vazio = apenas serviços internos do Render

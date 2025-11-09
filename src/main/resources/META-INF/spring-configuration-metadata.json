@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "app.reset-role-on-logout",
+      "type": "java.lang.Boolean",
+      "description": "Para desenvolvimento: define se o cargo do usuário deve ser resetado ao fazer logout.",
+      "defaultValue": false
+    }
+  ]
+}

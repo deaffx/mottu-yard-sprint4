@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="tailwind">
+    <script>
+        window.tailwind = window.tailwind || {};
+        window.tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#1e3a8a',
+                        'navy-dark': '#1e40af',
+                    }
+                }
+            }
+        };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</th:block>
+
+<!-- Status Tag - Moto -->
+<span th:fragment="moto-status-tag(moto)" th:switch="${moto.statusMoto}">
+    <span th:case="${T(br.com.fiap.mottu.yard.model.Moto.StatusMoto).PARA_REGULARIZAR}" 
+          class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
+        Para regularizar
+    </span>
+    <span th:case="${T(br.com.fiap.mottu.yard.model.Moto.StatusMoto).PARA_MANUTENCAO}" 
+          class="inline-flex items-center gap-1 rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-800">
+        Para manutenção
+    </span>
+    <span th:case="${T(br.com.fiap.mottu.yard.model.Moto.StatusMoto).NA_OFICINA}" 
+          class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800">
+        Na oficina
+    </span>
+    <span th:case="${T(br.com.fiap.mottu.yard.model.Moto.StatusMoto).PARA_ALUGAR}" 
+          class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-800">
+        Para alugar
+    </span>
+    <span th:case="*" 
+          class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700" 
+          th:text="${moto.statusMoto.label}">Status</span>
+</span>
+
+<!-- Status Tag - Manutencao -->
+<span th:fragment="manutencao-status-tag(manutencao)" 
+      class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold"
+      th:classappend="${manutencao.statusManutencao.name() == 'CONCLUIDA'} ? ' bg-green-100 text-green-800' :
+                     (${manutencao.statusManutencao.name() == 'EM_ANDAMENTO'} ? ' bg-blue-100 text-blue-800' :
+                     (${manutencao.statusManutencao.name() == 'AGENDADA'} ? ' bg-amber-100 text-amber-800' : ' bg-slate-100 text-slate-600'))"
+      th:text="${manutencao.statusManutencao.label}">Status</span>
+
+</html>

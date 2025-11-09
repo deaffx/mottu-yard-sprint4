@@ -1,0 +1,48 @@
+# Build artifacts
+.gradle
+build/
+bin/
+out/
+target/
+
+# IDE
+.idea
+.vscode
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings
+.sts4-cache
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentação e arquivos locais
+README.md
+DEPLOY.md
+*.md
+
+# Ambiente local
+.env
+.env.local
+compose.yaml
+docker-compose.yml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporários
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*~
