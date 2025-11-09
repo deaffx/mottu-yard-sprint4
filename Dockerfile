@@ -3,14 +3,12 @@ FROM gradle:8.5-jdk17-alpine AS build
 
 WORKDIR /app
 
-# Copiar arquivos de configuração do Gradle primeiro (melhor cache de layers)
+# Copiar todos os arquivos necessários
 COPY build.gradle settings.gradle ./
-COPY gradle ./gradle
-
-# Copiar código fonte
 COPY src ./src
 
-# Build da aplicação (sem testes para acelerar, rode testes no CI)
+# Build da aplicação usando o Gradle da imagem base
+# (não precisa do wrapper porque a imagem já tem Gradle instalado)
 RUN gradle bootJar -x test --no-daemon
 
 # Etapa de runtime - imagem menor
