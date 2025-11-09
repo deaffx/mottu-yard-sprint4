@@ -3,9 +3,8 @@ FROM gradle:8.5-jdk17-alpine AS build
 
 WORKDIR /app
 
-# Copiar arquivos de configuração do Gradle primeiro (melhor cache de layers)
+# Copiar arquivos de configuração do Gradle
 COPY build.gradle settings.gradle ./
-COPY gradle ./gradle
 
 # Copiar código fonte
 COPY src ./src
