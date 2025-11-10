@@ -21,16 +21,16 @@
                th:classappend="${activePage == 'patios'} ? ' bg-blue-600/70 text-white' : ' hover:bg-blue-700/40 text-white/80'">
                 Pátios
             </a>
-            <a th:href="@{/patios}" sec:authorize="hasRole('OPERADOR')"
-               class="rounded-full px-4 py-2 transition-colors duration-150 bg-gradient-to-r from-orange-500/80 to-red-500/80 hover:from-orange-600 hover:to-red-600"
-               title="Visualizar ocupação dos pátios">
-                🔥 Mapa de Calor
-            </a>
             <a th:href="@{/manutencao}"
                class="rounded-full px-4 py-2 transition-colors duration-150"
                th:classappend="${activePage == 'manutencao'} ? ' bg-blue-600/70 text-white' : ' hover:bg-blue-700/40 text-white/80'">
                 Manutenções
             </a>
+            <button onclick="openHeatMapModal()" sec:authorize="hasRole('OPERADOR')"
+                class="rounded-full px-4 py-2 transition-colors duration-150 bg-gradient-to-r from-orange-500/80 to-red-500/80 hover:from-orange-600 hover:to-red-600"
+                title="Visualizar ocupação dos pátios">
+                Mapa de Calor
+            </button>
 
             <div class="hidden h-6 w-px bg-white/40 md:block"></div>
 

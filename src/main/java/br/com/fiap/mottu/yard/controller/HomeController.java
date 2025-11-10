@@ -41,7 +41,16 @@ public class HomeController {
         model.addAttribute("statusManutencao", Manutencao.StatusManutencao.values());
         model.addAttribute("statusCounts", statusCounts);
         model.addAttribute("manutencoesPendentes", manutencaoService.findManutencoesPendentes());
-        model.addAttribute("patios", patioService.findAll());
+        
+        // Prepara lista de pátios com informações de ocupação
+        var patiosComOcupacao = patioService.findAll().stream()
+            .map(patio -> Map.of(
+                "patio", patio,
+                "ocupacao", patioService.getOcupacaoAtual(patio),
+                "percentual", patioService.getTaxaOcupacao(patio)
+            ))
+            .toList();
+        model.addAttribute("patios", patiosComOcupacao);
         model.addAttribute("motosRecentes", motoService.findRecentMotos(5));
 
         return "home/dashboard";

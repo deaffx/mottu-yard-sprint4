@@ -35,7 +35,7 @@ public class MotoController {
     }
 
     @GetMapping("/create")
-    public String create(@RequestParam(required = false) Long patioId, Model model) {
+    public String create(@RequestParam(value = "patioId", required = false) Long patioId, Model model) {
         Moto moto = new Moto();
         model.addAttribute("moto", moto);
         model.addAttribute("patios", patioService.findAll());
@@ -99,6 +99,16 @@ public class MotoController {
                 "Ocupação: " + ocupacaoAtual + "/" + moto.getPatioAtual().getCapacidadeMaxima());
             model.addAttribute("patios", patioService.findAll());
             return "motos/form";
+        }
+
+        // Validar se a vaga escolhida não está ocupada
+        if (moto.getSetor() != null && moto.getVaga() != null && patioOriginal != null) {
+            if (motoService.isVagaOcupada(patioOriginal, moto.getSetor(), moto.getVaga(), null)) {
+                result.rejectValue("setor", "error.moto", 
+                    String.format("A vaga %s-%02d já está ocupada por outra moto!", moto.getSetor(), moto.getVaga()));
+                model.addAttribute("patios", patioService.findAll());
+                return "motos/form";
+            }
         }
 
         // Se localização não foi definida, sugerir automaticamente
@@ -186,6 +196,33 @@ public class MotoController {
                     "Pátio lotado! Ocupação: " + ocupacao + "/" + moto.getPatioAtual().getCapacidadeMaxima());
                 model.addAttribute("patios", patioService.findAll());
                 return "motos/form";
+            }
+        }
+
+        // Validar se a vaga escolhida não está ocupada por outra moto
+        // IMPORTANTE: Usar o pátio do formulário (novo pátio), não o pátio original da moto
+        if (moto.getSetor() != null && moto.getVaga() != null && moto.getPatioAtual() != null) {
+            // Buscar o pátio completo atualizado
+            Patio patioParaValidar = moto.getPatioAtual();
+            if (patioParaValidar.getId() != null) {
+                patioParaValidar = patioService.findById(patioParaValidar.getId()).orElse(patioParaValidar);
+            }
+            
+            if (motoService.isVagaOcupada(patioParaValidar, moto.getSetor(), moto.getVaga(), id)) {
+                result.rejectValue("setor", "error.moto", 
+                    String.format("A vaga %s-%02d do pátio %s já está ocupada por outra moto!", 
+                        moto.getSetor(), moto.getVaga(), patioParaValidar.getNome()));
+                model.addAttribute("patios", patioService.findAll());
+                return "motos/form";
+            }
+        }
+
+        // Se a moto tem pátio mas não tem setor/vaga, alocar automaticamente
+        if (moto.getPatioAtual() != null && (moto.getSetor() == null || moto.getVaga() == null)) {
+            VagaSugerida vagaSugerida = alocacaoService.sugerirMelhorVaga(moto, moto.getPatioAtual());
+            if (vagaSugerida != null) {
+                moto.setSetor(vagaSugerida.getSetor());
+                moto.setVaga(vagaSugerida.getVaga());
             }
         }
 

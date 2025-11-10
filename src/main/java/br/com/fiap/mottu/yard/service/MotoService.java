@@ -46,6 +46,16 @@ public class MotoService {
     }
 
     public Moto save(Moto moto) {
+        // Validar se a vaga está ocupada antes de salvar
+        if (moto.getPatioAtual() != null && moto.getSetor() != null && moto.getVaga() != null) {
+            Long motoIdExcluir = moto.getId(); // null para novas motos
+            if (isVagaOcupada(moto.getPatioAtual(), moto.getSetor(), moto.getVaga(), motoIdExcluir)) {
+                throw new BusinessException(
+                    String.format("A vaga %s-%02d já está ocupada por outra moto!", 
+                        moto.getSetor(), moto.getVaga())
+                );
+            }
+        }
         return motoRepository.save(moto);
     }
 
@@ -112,5 +122,13 @@ public class MotoService {
             org.springframework.data.domain.PageRequest.of(0, limit, 
                 org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"))
         ).getContent();
+    }
+
+    // Verifica se uma vaga específica está ocupada por outra moto (exceto a moto informada)
+    public boolean isVagaOcupada(Patio patio, String setor, Integer vaga, Long motoIdExcluir) {
+        List<Moto> motos = findByPatio(patio);
+        return motos.stream()
+                .filter(m -> !m.getId().equals(motoIdExcluir)) // Excluir a própria moto
+                .anyMatch(m -> setor.equals(m.getSetor()) && vaga.equals(m.getVaga()));
     }
 }

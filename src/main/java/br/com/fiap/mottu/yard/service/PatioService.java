@@ -44,7 +44,21 @@ public class PatioService {
     public Patio save(Patio patio) {
         // Adicionar valores padrão se não foram especificados
         if (patio.getConfiguracaoSetores() == null || patio.getConfiguracaoSetores().isEmpty()) {
-            patio.setConfiguracaoSetores("{\"A\": 25, \"B\": 25, \"C\": 25, \"D\": 25}");
+            // Dividir a capacidade total do pátio igualmente entre os 4 setores
+            int capacidadeTotal = patio.getCapacidadeMaxima() != null ? patio.getCapacidadeMaxima() : 100;
+            int capacidadePorSetor = capacidadeTotal / 4;
+            int resto = capacidadeTotal % 4;
+            
+            // Distribuir o resto entre os primeiros setores
+            int capacidadeA = capacidadePorSetor + (resto > 0 ? 1 : 0);
+            int capacidadeB = capacidadePorSetor + (resto > 1 ? 1 : 0);
+            int capacidadeC = capacidadePorSetor + (resto > 2 ? 1 : 0);
+            int capacidadeD = capacidadePorSetor;
+            
+            patio.setConfiguracaoSetores(
+                String.format("{\"A\": %d, \"B\": %d, \"C\": %d, \"D\": %d}", 
+                    capacidadeA, capacidadeB, capacidadeC, capacidadeD)
+            );
         }
         if (patio.getSetorOficina() == null || patio.getSetorOficina().isEmpty()) {
             patio.setSetorOficina("D");

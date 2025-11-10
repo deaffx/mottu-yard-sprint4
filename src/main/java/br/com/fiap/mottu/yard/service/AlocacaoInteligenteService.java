@@ -22,9 +22,7 @@ public class AlocacaoInteligenteService {
     private final MotoRepository motoRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    /**
-     * Sugere a melhor vaga para uma moto baseado em regras de negócio
-     */
+    // Sugere a melhor vaga para uma moto baseado em regras de negócio
     public VagaSugerida sugerirMelhorVaga(Moto moto, Patio patio) {
         Map<String, Integer> configuracao = parseConfiguracaoSetores(patio.getConfiguracaoSetores());
         Map<String, OcupacaoSetor> ocupacaoPorSetor = calcularOcupacaoPorSetor(patio, configuracao);
@@ -59,9 +57,7 @@ public class AlocacaoInteligenteService {
         return encontrarVagaEquilibrada(patio, ocupacaoPorSetor, configuracao);
     }
 
-    /**
-     * Calcula ocupação de cada setor
-     */
+    // Calcula ocupação de cada setor
     public Map<String, OcupacaoSetor> calcularOcupacaoPorSetor(Patio patio, Map<String, Integer> configuracao) {
         List<Moto> motos = motoRepository.findByPatioAtualAndDeletedAtIsNull(patio);
         
@@ -90,9 +86,7 @@ public class AlocacaoInteligenteService {
         return resultado;
     }
 
-    /**
-     * Encontra vaga livre em um setor específico
-     */
+    // Encontra vaga livre em um setor específico
     private VagaSugerida encontrarVagaLivre(String setor, Patio patio, Map<String, OcupacaoSetor> ocupacao) {
         OcupacaoSetor ocupacaoSetor = ocupacao.get(setor);
         
@@ -125,9 +119,7 @@ public class AlocacaoInteligenteService {
         return null;
     }
 
-    /**
-     * Encontra vaga em setor com menor ocupação (balanceamento)
-     */
+    // Encontra vaga em setor com menor ocupação (balanceamento)
     private VagaSugerida encontrarVagaEquilibrada(Patio patio, 
                                                    Map<String, OcupacaoSetor> ocupacao,
                                                    Map<String, Integer> configuracao) {
@@ -154,9 +146,7 @@ public class AlocacaoInteligenteService {
         return null; // Pátio completamente lotado
     }
 
-    /**
-     * Parse da configuração JSON de setores
-     */
+    // Parse da configuração JSON de setores
     private Map<String, Integer> parseConfiguracaoSetores(String json) {
         if (json == null || json.isBlank()) {
             // Configuração padrão
@@ -176,9 +166,7 @@ public class AlocacaoInteligenteService {
         }
     }
 
-    /**
-     * Gera lista de recomendações de reorganização
-     */
+    // Gera lista de recomendações de reorganização
     public List<String> gerarRecomendacoesReorganizacao(Patio patio) {
         Map<String, Integer> configuracao = parseConfiguracaoSetores(patio.getConfiguracaoSetores());
         Map<String, OcupacaoSetor> ocupacao = calcularOcupacaoPorSetor(patio, configuracao);

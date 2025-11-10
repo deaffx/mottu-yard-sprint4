@@ -81,53 +81,61 @@
                             </div>
                         </div>
 
-                        <!-- Seção de Localização Inteligente -->
+                        <!-- Seção de Localização Visual -->
                         <div class="rounded-lg border border-slate-200 bg-slate-50 p-6 space-y-4">
-                            <div class="flex items-center gap-2">
-                                <i class="bi bi-pin-map-fill text-lg text-navy"></i>
-                                <h3 class="text-base font-semibold text-slate-700">Localização no Pátio</h3>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <i class="bi bi-pin-map-fill text-lg text-navy"></i>
+                                    <h3 class="text-base font-semibold text-slate-700">Selecione a Localização no Mapa</h3>
+                                </div>
+                                <div id="localizacao-selecionada" class="text-sm font-semibold text-navy hidden">
+                                    Selecionado: <span id="localizacao-texto">-</span>
+                                </div>
                             </div>
 
-                            <!-- Sugestão Inteligente -->
-                            <div th:if="${vagaSugerida != null}" class="rounded-md bg-blue-50 border border-blue-200 p-4">
-                                <div class="flex items-start gap-3">
-                                    <i class="bi bi-lightbulb-fill text-xl text-blue-600"></i>
-                                    <div class="flex-1">
-                                        <p class="text-sm font-semibold text-blue-900">Sugestão Inteligente</p>
-                                        <p class="mt-1 text-xs text-blue-700">
-                                            Localização recomendada: <strong th:text="${vagaSugerida.localizacaoCompleta}">A-15</strong>
-                                        </p>
-                                        <p class="mt-1 text-xs text-blue-600" th:text="${vagaSugerida.motivo}">Setor com menor ocupação</p>
-                                        <p class="mt-1 text-xs text-blue-500">
-                                            Ocupação do setor: <span th:text="${#numbers.formatDecimal(vagaSugerida.percentualOcupacaoSetor, 1, 1)}">45.0</span>%
-                                        </p>
+                            <!-- Campos Hidden para enviar ao backend -->
+                            <input type="hidden" id="setor" th:field="*{setor}">
+                            <input type="hidden" id="vaga" th:field="*{vaga}">
+
+                            <!-- Mapa Visual do Pátio -->
+                            <div id="mapa-patio" class="hidden">
+                                <div class="text-center mb-3">
+                                    <div class="inline-flex items-center gap-2 rounded-lg bg-slate-700 px-3 py-1.5 text-white text-xs font-semibold">
+                                        <i class="bi bi-arrow-down-circle text-sm"></i>
+                                        ENTRADA DO PÁTIO
+                                        <i class="bi bi-arrow-down-circle text-sm"></i>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="grid gap-4 md:grid-cols-3">
-                                <div>
-                                    <label for="setor" class="mb-2 block text-sm font-semibold text-slate-600">Setor</label>
-                                    <input id="setor" type="text" th:field="*{setor}" maxlength="5" placeholder="Ex: A"
-                                           class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm uppercase shadow-sm focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy/40">
-                                    <p class="mt-1 text-xs text-slate-400">Opcional - deixe vazio para sugestão automática</p>
+                                <div class="grid grid-cols-2 gap-3 max-w-4xl mx-auto" id="setores-container">
+                                    <!-- Os setores serão gerados dinamicamente pelo JavaScript -->
                                 </div>
-                                <div>
-                                    <label for="vaga" class="mb-2 block text-sm font-semibold text-slate-600">Vaga</label>
-                                    <input id="vaga" type="number" th:field="*{vaga}" min="1" placeholder="Ex: 15"
-                                           class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm shadow-sm focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy/40">
-                                    <p class="mt-1 text-xs text-slate-400">Número da vaga no setor</p>
-                                </div>
-                                <div class="md:col-span-1">
-                                    <label for="localizacaoObservacao" class="mb-2 block text-sm font-semibold text-slate-600">Observação</label>
-                                    <input id="localizacaoObservacao" type="text" th:field="*{localizacaoObservacao}" maxlength="200" placeholder="Ex: Próximo ao portão"
-                                           class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm shadow-sm focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy/40">
+
+                                <div class="mt-4 flex justify-center gap-3 text-xs">
+                                    <div class="flex items-center gap-1.5">
+                                        <div class="w-6 h-6 rounded border-2 border-red-600 bg-red-100 flex items-center justify-center text-[8px] font-bold text-red-600">
+                                            01
+                                        </div>
+                                        <span class="text-slate-700">Ocupada</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5">
+                                        <div class="w-6 h-6 rounded border-2 border-slate-300 bg-white flex items-center justify-center text-[8px] font-bold text-slate-600">
+                                            02
+                                        </div>
+                                        <span class="text-slate-700">Disponível</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5">
+                                        <div class="w-6 h-6 rounded border-2 border-navy bg-navy flex items-center justify-center text-[8px] font-bold text-white ring-2 ring-blue-400">
+                                            03
+                                        </div>
+                                        <span class="text-slate-700">Selecionada</span>
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="flex items-start gap-2 text-xs text-slate-500">
                                 <i class="bi bi-info-circle mt-0.5"></i>
-                                <p>Se não especificar setor e vaga, o sistema alocará automaticamente na melhor posição disponível baseado no status da moto.</p>
+                                <p>Selecione um pátio para visualizar o mapa e escolher a localização. Clique em uma vaga disponível para selecioná-la.</p>
                             </div>
                         </div>
 
@@ -148,22 +156,175 @@
             });
         }
 
+        // Gerenciamento do Mapa de Localização
+        const patioSelect = document.getElementById('patioAtual');
+        const mapaContainer = document.getElementById('mapa-patio');
+        const setoresContainer = document.getElementById('setores-container');
         const setorInput = document.getElementById('setor');
-        if (setorInput) {
-            setorInput.addEventListener('input', (event) => {
-                event.target.value = event.target.value.toUpperCase();
+        const vagaInput = document.getElementById('vaga');
+        const localizacaoSelecionada = document.getElementById('localizacao-selecionada');
+        const localizacaoTexto = document.getElementById('localizacao-texto');
+
+        let setorSelecionado = setorInput.value || null;
+        let vagaSelecionada = vagaInput.value ? parseInt(vagaInput.value) : null;
+        let mapaData = null;
+        
+        // Guardar a vaga original da moto (em modo de edição) e o pátio original
+        const patioOriginalId = patioSelect.value || null;
+        const setorOriginal = setorInput.value || null;
+        const vagaOriginal = vagaInput.value ? parseInt(vagaInput.value) : null;
+
+        // Carregar mapa quando selecionar pátio
+        if (patioSelect) {
+            patioSelect.addEventListener('change', async function() {
+                const patioId = this.value;
+                
+                if (!patioId) {
+                    mapaContainer.classList.add('hidden');
+                    return;
+                }
+
+                // Se mudou de pátio, limpar seleção atual
+                if (patioOriginalId && patioId !== patioOriginalId) {
+                    setorSelecionado = null;
+                    vagaSelecionada = null;
+                    setorInput.value = '';
+                    vagaInput.value = '';
+                    localizacaoSelecionada.classList.add('hidden');
+                }
+
+                try {
+                    // Buscar dados do mapa do pátio
+                    const response = await fetch(`/api/patios/${patioId}/mapa`);
+                    mapaData = await response.json();
+                    
+                    renderizarMapa();
+                    mapaContainer.classList.remove('hidden');
+                } catch (error) {
+                    console.error('Erro ao carregar mapa:', error);
+                    alert('Erro ao carregar o mapa do pátio. Tente novamente.');
+                }
             });
         }
 
-        // Auto-preencher com sugestão ao clicar
-        const usarSugestaoBtn = document.querySelector('[data-usar-sugestao]');
-        if (usarSugestaoBtn) {
-            usarSugestaoBtn.addEventListener('click', () => {
-                const sugestao = usarSugestaoBtn.dataset;
-                if (sugestao.setor) document.getElementById('setor').value = sugestao.setor;
-                if (sugestao.vaga) document.getElementById('vaga').value = sugestao.vaga;
+        function renderizarMapa() {
+            if (!mapaData || !mapaData.setores) return;
+
+            setoresContainer.innerHTML = '';
+
+            mapaData.setores.forEach((setor, index) => {
+                const setorDiv = document.createElement('div');
+                setorDiv.className = 'relative';
+
+                // Header do setor
+                const header = document.createElement('div');
+                header.className = 'mb-1.5 flex items-center justify-between';
+                header.innerHTML = `
+                    <div class="flex items-center gap-1.5">
+                        <div class="rounded px-2 py-0.5 font-bold text-base ${getSetorColorClass(setor.percentualOcupacao)}">
+                            Setor ${setor.setor}
+                        </div>
+                        <span class="text-[10px] text-slate-600">${setor.motosOcupadas}/${setor.capacidadeSetor}</span>
+                    </div>
+                `;
+
+                // Grid de vagas - quantidade baseada na capacidade do setor
+                const grid = document.createElement('div');
+                
+                // Determinar número de colunas baseado na capacidade do setor
+                const capacidade = setor.capacidadeSetor || 0;
+                const numColunas = capacidade <= 25 ? 5 : (capacidade <= 50 ? 10 : 15);
+                grid.className = `grid gap-1 p-2 rounded-lg border-2 ${getSetorBorderClass(setor.percentualOcupacao)}`;
+                grid.style.gridTemplateColumns = `repeat(${numColunas}, minmax(0, 1fr))`;
+
+                // Buscar vagas ocupadas do backend
+                let vagasOcupadas = mapaData.vagasOcupadas?.[setor.setor] || [];
+                
+                // Se estamos editando uma moto E ainda estamos no pátio original,
+                // remover a vaga original da lista de ocupadas para permitir re-seleção
+                const patioAtualId = patioSelect.value;
+                if (patioAtualId === patioOriginalId && setorOriginal === setor.setor && vagaOriginal) {
+                    vagasOcupadas = vagasOcupadas.filter(v => v !== vagaOriginal);
+                }
+
+                // Mostrar vagas até a capacidade do setor
+                for (let i = 1; i <= capacidade; i++) {
+                    const vaga = document.createElement('div');
+                    vaga.className = 'aspect-square rounded border flex items-center justify-center transition-all cursor-pointer text-[9px] font-semibold';
+                    
+                    const isOcupada = vagasOcupadas.includes(i);
+                    const isSelecionada = setorSelecionado === setor.setor && vagaSelecionada === i;
+
+                    if (isSelecionada) {
+                        vaga.style = 'background: #1e3a8a; border-color: #1e3a8a; color: white;';
+                        vaga.classList.add('ring-2', 'ring-blue-400');
+                    } else if (isOcupada) {
+                        vaga.style = 'background: #fee2e2; border-color: #dc2626; color: #dc2626;';
+                        vaga.classList.add('cursor-not-allowed');
+                    } else {
+                        vaga.style = 'background: white; border-color: #cbd5e1; color: #64748b;';
+                        vaga.classList.add('hover:border-navy', 'hover:scale-110', 'hover:bg-blue-50');
+                    }
+
+                    // Mostrar o número da vaga (ex: A-01, A-02, B-25, etc.)
+                    const numeroFormatado = String(i).padStart(2, '0');
+                    vaga.innerHTML = `${setor.setor}-${numeroFormatado}`;
+                    vaga.title = `Vaga ${setor.setor}-${numeroFormatado}${isOcupada ? ' (Ocupada)' : ''}`;
+
+                    // Adicionar evento de clique apenas em vagas disponíveis
+                    if (!isOcupada) {
+                        vaga.addEventListener('click', () => selecionarVaga(setor.setor, i));
+                    }
+
+                    grid.appendChild(vaga);
+                }
+
+                setorDiv.appendChild(header);
+                setorDiv.appendChild(grid);
+                setoresContainer.appendChild(setorDiv);
             });
         }
+
+        function selecionarVaga(setor, vaga) {
+            setorSelecionado = setor;
+            vagaSelecionada = vaga;
+
+            // Atualizar campos hidden
+            setorInput.value = setor;
+            vagaInput.value = vaga;
+
+            // Atualizar texto de localização selecionada
+            localizacaoTexto.textContent = `${setor}-${String(vaga).padStart(2, '0')}`;
+            localizacaoSelecionada.classList.remove('hidden');
+
+            // Re-renderizar mapa para atualizar visual
+            renderizarMapa();
+        }
+
+        function getSetorColorClass(percentual) {
+            if (percentual >= 90) return 'bg-red-100 text-red-700';
+            if (percentual >= 70) return 'bg-orange-100 text-orange-700';
+            if (percentual >= 50) return 'bg-yellow-100 text-yellow-700';
+            return 'bg-green-100 text-green-700';
+        }
+
+        function getSetorBorderClass(percentual) {
+            if (percentual >= 90) return 'border-red-300 bg-red-50/30';
+            if (percentual >= 70) return 'border-orange-300 bg-orange-50/30';
+            if (percentual >= 50) return 'border-yellow-300 bg-yellow-50/30';
+            return 'border-green-300 bg-green-50/30';
+        }
+
+        // Carregar mapa se já houver pátio selecionado (modo edição)
+        window.addEventListener('DOMContentLoaded', () => {
+            if (patioSelect && patioSelect.value) {
+                patioSelect.dispatchEvent(new Event('change'));
+            }
+        });
     </script>
+
+    <!-- Modal de Mapa de Calor -->
+    <div th:replace="~{fragments/modals :: heatMapModal}"></div>
+
 </body>
 </html>

@@ -70,14 +70,55 @@
                 </div>
             </div>
 
-            <!-- Mapa de Calor por Setores -->
+            <!-- Visualização do Mapa do Pátio -->
+            <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <div class="border-b border-slate-200 px-8 py-6">
+                    <h2 class="text-lg font-semibold text-slate-700 flex items-center gap-2">
+                        <i class="bi bi-map-fill text-navy"></i>
+                        Mapa do Pátio
+                    </h2>
+                    <p class="mt-1 text-sm text-slate-600">Visualização em tempo real de cada vaga do pátio</p>
+                </div>
+
+                <div class="p-4">
+                    <div class="max-w-6xl mx-auto space-y-3">
+                        <!-- Entrada do Pátio -->
+                        <div class="text-center">
+                            <div class="inline-flex items-center gap-2 rounded-lg bg-slate-700 px-3 py-1.5 text-white text-xs font-semibold shadow-lg">
+                                <i class="bi bi-arrow-down-circle text-sm"></i>
+                                ENTRADA DO PÁTIO
+                                <i class="bi bi-arrow-down-circle text-sm"></i>
+                            </div>
+                        </div>
+
+                        <!-- Grid de Setores (2x2) - Renderizado via JavaScript -->
+                        <div id="setores-container" class="grid grid-cols-2 gap-3"></div>
+
+                        <!-- Legenda -->
+                        <div class="mt-4 flex justify-center gap-4 text-xs">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded border flex items-center justify-center text-[9px] font-semibold bg-gradient-to-br from-blue-800 to-blue-900 border-blue-800 text-white">01</div>
+                                <span class="text-slate-700">Ocupada</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded border flex items-center justify-center text-[9px] font-semibold bg-white border-slate-300 text-slate-600">02</div>
+                                <span class="text-slate-700">Disponível</span>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- Detalhes dos Setores (Cards) -->
             <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <div class="border-b border-slate-200 px-8 py-6">
                     <h2 class="text-lg font-semibold text-slate-700 flex items-center gap-2">
                         <i class="bi bi-thermometer-half text-navy"></i>
-                        Ocupação por Setor
+                        Detalhes por Setor
                     </h2>
-                    <p class="mt-1 text-sm text-slate-600">Visualização da distribuição de motos nos setores do pátio</p>
+                    <p class="mt-1 text-sm text-slate-600">Informações detalhadas de cada setor do pátio</p>
                 </div>
 
                 <div class="p-8">
@@ -132,12 +173,12 @@
                 </div>
             </section>
 
-            <!-- Recomendações Inteligentes -->
+            <!-- Recomendações -->
             <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <div class="border-b border-slate-200 px-8 py-6">
                     <h2 class="text-lg font-semibold text-slate-700 flex items-center gap-2">
                         <i class="bi bi-lightbulb-fill text-navy"></i>
-                        Recomendações Inteligentes
+                        Recomendações
                     </h2>
                 </div>
 
@@ -216,5 +257,110 @@
     </main>
 
     <footer th:replace="~{fragments/app-footer :: footer}"></footer>
+
+    <script th:inline="javascript">
+        // Carregar mapa dinamicamente
+        const patioId = /*[[${patio.id}]]*/ null;
+        const setoresContainer = document.getElementById('setores-container');
+
+        async function carregarMapa() {
+            try {
+                const response = await fetch(`/api/patios/${patioId}/mapa`);
+                const mapaData = await response.json();
+                renderizarMapa(mapaData);
+            } catch (error) {
+                console.error('Erro ao carregar mapa:', error);
+            }
+        }
+
+        function renderizarMapa(mapaData) {
+            if (!mapaData || !mapaData.setores) return;
+
+            setoresContainer.innerHTML = '';
+
+            mapaData.setores.forEach((setor) => {
+                const setorDiv = document.createElement('div');
+                setorDiv.className = 'relative';
+
+                // Header do setor
+                const header = document.createElement('div');
+                header.className = 'mb-1.5 flex items-center justify-between';
+                header.innerHTML = `
+                    <div class="flex items-center gap-1.5">
+                        <div class="rounded px-2 py-0.5 font-bold text-base ${getSetorColorClass(setor.percentualOcupacao)}">
+                            Setor ${setor.setor}
+                        </div>
+                        <span class="text-[10px] text-slate-600">${setor.motosOcupadas}/${setor.capacidadeSetor}</span>
+                    </div>
+                    <span class="rounded-full px-1.5 py-0.5 text-[10px] font-bold ${getPercentBadgeClass(setor.percentualOcupacao)}">
+                        ${setor.percentualOcupacao.toFixed(0)}%
+                    </span>
+                `;
+
+                // Grid de vagas - quantidade baseada na capacidade do setor
+                const grid = document.createElement('div');
+                
+                // Determinar número de colunas baseado na capacidade do setor
+                const capacidade = setor.capacidadeSetor || 0;
+                const numColunas = capacidade <= 25 ? 5 : (capacidade <= 50 ? 10 : 15);
+                grid.className = `grid gap-1 p-2 rounded-lg border-2 ${getSetorBorderClass(setor.percentualOcupacao)}`;
+                grid.style.gridTemplateColumns = `repeat(${numColunas}, minmax(0, 1fr))`;
+
+                // Buscar vagas ocupadas do backend
+                const vagasOcupadas = mapaData.vagasOcupadas?.[setor.setor] || [];
+
+                // Mostrar vagas até a capacidade do setor
+                for (let i = 1; i <= capacidade; i++) {
+                    const vaga = document.createElement('div');
+                    vaga.className = 'aspect-square rounded border flex items-center justify-center text-[9px] font-semibold transition-all';
+                    
+                    const isOcupada = vagasOcupadas.includes(i);
+
+                    if (isOcupada) {
+                        vaga.style = 'background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); border-color: #1e3a8a; color: white;';
+                        vaga.classList.add('cursor-default');
+                    } else {
+                        vaga.style = 'background: white; border-color: #cbd5e1; color: #94a3b8;';
+                        vaga.classList.add('hover:scale-105', 'cursor-pointer');
+                    }
+
+                    // Mostrar o número da vaga (ex: A-01, A-02, B-25, etc.)
+                    const numeroFormatado = String(i).padStart(2, '0');
+                    vaga.innerHTML = `${setor.setor}-${numeroFormatado}`;
+                    vaga.title = `Vaga ${setor.setor}-${numeroFormatado}${isOcupada ? ' (Ocupada)' : ' (Disponível)'}`;
+
+                    grid.appendChild(vaga);
+                }
+
+                setorDiv.appendChild(header);
+                setorDiv.appendChild(grid);
+                setoresContainer.appendChild(setorDiv);
+            });
+        }
+
+        function getSetorColorClass(percentual) {
+            if (percentual >= 90) return 'bg-red-100 text-red-700';
+            if (percentual >= 70) return 'bg-orange-100 text-orange-700';
+            if (percentual >= 50) return 'bg-yellow-100 text-yellow-700';
+            return 'bg-green-100 text-green-700';
+        }
+
+        function getPercentBadgeClass(percentual) {
+            if (percentual >= 90) return 'bg-red-600 text-white';
+            if (percentual >= 70) return 'bg-orange-600 text-white';
+            if (percentual >= 50) return 'bg-yellow-600 text-white';
+            return 'bg-green-600 text-white';
+        }
+
+        function getSetorBorderClass(percentual) {
+            if (percentual >= 90) return 'border-red-300 bg-red-50/30';
+            if (percentual >= 70) return 'border-orange-300 bg-orange-50/30';
+            if (percentual >= 50) return 'border-yellow-300 bg-yellow-50/30';
+            return 'border-green-300 bg-green-50/30';
+        }
+
+        // Carregar mapa ao carregar a página
+        window.addEventListener('DOMContentLoaded', carregarMapa);
+    </script>
 </body>
 </html>

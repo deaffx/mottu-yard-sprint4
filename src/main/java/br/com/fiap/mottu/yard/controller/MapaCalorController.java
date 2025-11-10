@@ -1,7 +1,6 @@
 package br.com.fiap.mottu.yard.controller;
 
 import br.com.fiap.mottu.yard.dto.MapaCalor;
-import br.com.fiap.mottu.yard.model.Patio;
 import br.com.fiap.mottu.yard.service.AlocacaoInteligenteService;
 import br.com.fiap.mottu.yard.service.MapaCalorService;
 import br.com.fiap.mottu.yard.service.MotoService;

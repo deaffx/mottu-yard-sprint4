@@ -27,15 +27,30 @@ public class MapaCalorService {
     private final HistoricoMovimentacaoRepository historicoRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    /**
-     * Gera mapa de calor completo do pátio
-     */
+    // Gera mapa de calor completo do pátio
     public MapaCalor gerarMapaCalor(Patio patio) {
         Map<String, Integer> configuracao = parseConfiguracaoSetores(patio.getConfiguracaoSetores());
         Map<String, OcupacaoSetor> ocupacaoPorSetor = alocacaoService.calcularOcupacaoPorSetor(patio, configuracao);
 
-        List<OcupacaoSetor> setoresOrdenados = new ArrayList<>(ocupacaoPorSetor.values());
-        setoresOrdenados.sort(Comparator.comparing(OcupacaoSetor::getSetor));
+        // Garantir que sempre temos os 4 setores (A, B, C, D) na ordem correta
+        List<String> setoresPadrao = Arrays.asList("A", "B", "C", "D");
+        List<OcupacaoSetor> setoresOrdenados = new ArrayList<>();
+        
+        for (String setor : setoresPadrao) {
+            OcupacaoSetor ocupacao = ocupacaoPorSetor.get(setor);
+            if (ocupacao != null) {
+                setoresOrdenados.add(ocupacao);
+            } else {
+                // Se o setor não existe na configuração, criar um vazio
+                OcupacaoSetor setorVazio = new OcupacaoSetor();
+                setorVazio.setSetor(setor);
+                setorVazio.setMotosOcupadas(0);
+                setorVazio.setCapacidadeSetor(0);
+                setorVazio.setPercentualOcupacao(0.0);
+                setorVazio.setStatus("N/A");
+                setoresOrdenados.add(setorVazio);
+            }
+        }
 
         int totalMotos = setoresOrdenados.stream()
                 .mapToInt(OcupacaoSetor::getMotosOcupadas)
@@ -58,9 +73,7 @@ public class MapaCalorService {
         return mapa;
     }
 
-    /**
-     * Registra movimentação no histórico
-     */
+    // Registra movimentação no histórico
     @Transactional
     public void registrarMovimentacao(Moto moto, 
                                        Patio patioOrigem, String setorOrigem, Integer vagaOrigem,
@@ -86,16 +99,12 @@ public class MapaCalorService {
                 setorDestino, vagaDestino);
     }
 
-    /**
-     * Busca histórico de uma moto
-     */
+    // Busca histórico de uma moto
     public List<HistoricoMovimentacao> buscarHistoricoMoto(Moto moto) {
         return historicoRepository.findByMotoOrderByDataMovimentacaoDesc(moto);
     }
 
-    /**
-     * Parse da configuração JSON de setores
-     */
+    // Busca histórico de movimentações
     private Map<String, Integer> parseConfiguracaoSetores(String json) {
         if (json == null || json.isBlank()) {
             Map<String, Integer> padrao = new HashMap<>();
@@ -114,9 +123,7 @@ public class MapaCalorService {
         }
     }
 
-    /**
-     * Obtém usuário logado do contexto de segurança
-     */
+    // Obtém usuário logado do contexto de segurança
     private String getUsuarioLogado() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
